@@ -1,0 +1,52 @@
+name: staging-gke
+imports:
+  - path: ../../deploymentmanager-samples/community/cloud-foundation/templates/gke/gke.py
+    name: gke.py
+project: acme-staging-001
+resources:
+  - name: staging-gke
+    type: gke.py
+    properties:
+      clusterLocationType: Regional
+      region: us-east1
+      cluster:
+        name: staging-gke
+        description: staging tenant
+        network: $(out.acme-infra-001.network.shared-vpc.selfLink)
+        subnetwork: staging-gke-nodes-subnet
+        intialNodeCount: 3
+        initialClusterVersion: 1.11.2-gke.26
+        nodeConfig:
+          localSsdCount: 1
+          oauthScopes:
+            - https://www.googleapis.com/auth/compute
+            - https://www.googleapis.com/auth/devstorage.read_only
+            - https://www.googleapis.com/auth/logging.write
+            - https://www.googleapis.com/auth/monitoring
+        tags:
+          - gke-staging
+        locations:
+          - us-east1-c
+          - us-east1-b
+          - us-east1-d
+        autoScaling:
+          enabled: True
+          minNodeCount: 1
+          maxNodeCount: 10
+        management:
+          autoUpgrade: True
+          autoRepair: True
+        masterAuth:
+          username: ""
+        loggingService: logging.googleapis.com
+        monitoringService: monitoring.googleapis.com
+        privateCluster: True
+#        networkPolicy:
+#          enabled: True
+#          provider: CALICO
+        ipAllocationPolicy:
+          useIpAliases: True
+          createSubnetwork: False
+          clusterSecondaryRangeName: staging-gke-pods-subnet
+          servicesSecondaryRangeName: staging-gke-services-subnet
+        masterIpv4CidrBlock: 10.19.5.0/28

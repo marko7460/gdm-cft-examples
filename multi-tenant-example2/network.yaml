@@ -1,0 +1,31 @@
+name: network
+imports:
+  - path: ../../deploymentmanager-samples/community/cloud-foundation/templates/network/network.py
+    name: network.py
+  - path: ../../deploymentmanager-samples/community/cloud-foundation/templates/network/subnetwork.py
+    name: subnetwork.py
+project: acme-infra-001
+resources:
+  - name: shared-vpc
+    type: network.py
+    properties:
+      autoCreateSubnetworks: false
+      subnetworks:
+        - name: dev-gke-nodes-subnet
+          region: us-east1
+          ipCidrRange: 10.17.4.0/24
+          privateIpGoogleAccess: true
+          secondaryIpRanges:
+            - rangeName: dev-gke-pods-subnet
+              ipCidrRange: 10.16.0.0/16
+            - rangeName: dev-gke-services-subnet
+              ipCidrRange: 10.17.0.0/22
+        - name: staging-gke-nodes-subnet
+          region: us-east1
+          privateIpGoogleAccess: true
+          ipCidrRange: 10.19.4.0/24
+          secondaryIpRanges:
+            - rangeName: staging-gke-pods-subnet
+              ipCidrRange: 10.18.0.0/16
+            - rangeName: staging-gke-services-subnet
+              ipCidrRange: 10.19.0.0/22
