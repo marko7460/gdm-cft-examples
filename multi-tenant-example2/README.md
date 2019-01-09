@@ -53,5 +53,10 @@ Example how to create two tier gke clusters where one tier serves developers and
 1. Run `cft apply dev-gke.yaml`
 2. Run `cft apply staging-gke.yaml`
 
+# Cleanup
+1. `cft delete dev-gke.yaml`
+1. `cft delete staging-gke.yaml`
+1. `cft delete network.yaml`
+
 # References
 https://cloud.google.com/vpc/docs/provisioning-shared-vpc#enable-shared-vpc-host
