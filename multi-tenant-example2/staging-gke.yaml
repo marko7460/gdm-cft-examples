@@ -50,3 +50,5 @@ resources:
           clusterSecondaryRangeName: staging-gke-pods-subnet
           servicesSecondaryRangeName: staging-gke-services-subnet
         masterIpv4CidrBlock: 10.19.5.0/28
+        masterAuthorizedNetworksConfig:
+          enabled: True

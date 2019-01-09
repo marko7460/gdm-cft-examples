@@ -50,3 +50,5 @@ resources:
           clusterSecondaryRangeName: dev-gke-pods-subnet
           servicesSecondaryRangeName: dev-gke-services-subnet
         masterIpv4CidrBlock: 10.17.5.0/28
+        masterAuthorizedNetworksConfig:
+          enabled: True

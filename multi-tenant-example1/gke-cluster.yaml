@@ -22,7 +22,7 @@ resources:
               ipCidrRange: 10.16.0.0/16
             - rangeName: corp-gke-services-subnet
               ipCidrRange: 10.17.0.0/22
-  - name: dev-gke
+  - name: corp-gke
     type: gke.py
     properties:
       clusterLocationType: Regional
@@ -42,7 +42,7 @@ resources:
             - https://www.googleapis.com/auth/logging.write
             - https://www.googleapis.com/auth/monitoring
         tags:
-          - gke-dev
+          - gke-corp
         locations:
           - us-east1-c
           - us-east1-b
@@ -59,12 +59,14 @@ resources:
         loggingService: logging.googleapis.com
         monitoringService: monitoring.googleapis.com
         privateCluster: True
-#        networkPolicy:
-#          enabled: True
-#          provider: CALICO
+        #networkPolicy:
+        #  enabled: True
+        #  provider: CALICO
         ipAllocationPolicy:
           useIpAliases: True
           createSubnetwork: False
           clusterSecondaryRangeName: $(ref.corp-gke-nodes-subnet.secondaryIpRanges[0].rangeName)
           servicesSecondaryRangeName: $(ref.corp-gke-nodes-subnet.secondaryIpRanges[1].rangeName)
         masterIpv4CidrBlock: 10.17.5.0/28
+        masterAuthorizedNetworksConfig:
+          enabled: True
