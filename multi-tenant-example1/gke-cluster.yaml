@@ -1,0 +1,70 @@
+name: gke-cluster
+imports:
+  - path: ../../deploymentmanager-samples/community/cloud-foundation/templates/network/network.py
+    name: network.py
+  - path: ../../deploymentmanager-samples/community/cloud-foundation/templates/network/subnetwork.py
+    name: subnetwork.py
+  - path: ../../deploymentmanager-samples/community/cloud-foundation/templates/gke/gke.py
+    name: gke.py
+project: acme-corp-001
+resources:
+  - name: gke-vpc
+    type: network.py
+    properties:
+      autoCreateSubnetworks: false
+      subnetworks:
+        - name: corp-gke-nodes-subnet
+          region: us-east1
+          ipCidrRange: 10.17.4.0/24
+          privateIpGoogleAccess: true
+          secondaryIpRanges:
+            - rangeName: corp-gke-pods-subnet
+              ipCidrRange: 10.16.0.0/16
+            - rangeName: corp-gke-services-subnet
+              ipCidrRange: 10.17.0.0/22
+  - name: dev-gke
+    type: gke.py
+    properties:
+      clusterLocationType: Regional
+      region: us-east1
+      cluster:
+        name: corp-gke
+        description: single tenant with multiple namespaces
+        network: $(ref.gke-vpc.selfLink)
+        subnetwork: corp-gke-nodes-subnet
+        intialNodeCount: 3
+        initialClusterVersion: 1.11.2-gke.26
+        nodeConfig:
+          localSsdCount: 1
+          oauthScopes:
+            - https://www.googleapis.com/auth/compute
+            - https://www.googleapis.com/auth/devstorage.read_only
+            - https://www.googleapis.com/auth/logging.write
+            - https://www.googleapis.com/auth/monitoring
+        tags:
+          - gke-dev
+        locations:
+          - us-east1-c
+          - us-east1-b
+          - us-east1-d
+        autoScaling:
+          enabled: True
+          minNodeCount: 1
+          maxNodeCount: 10
+        management:
+          autoUpgrade: True
+          autoRepair: True
+        masterAuth:
+          username: ""
+        loggingService: logging.googleapis.com
+        monitoringService: monitoring.googleapis.com
+        privateCluster: True
+#        networkPolicy:
+#          enabled: True
+#          provider: CALICO
+        ipAllocationPolicy:
+          useIpAliases: True
+          createSubnetwork: False
+          clusterSecondaryRangeName: $(ref.corp-gke-nodes-subnet.secondaryIpRanges[0].rangeName)
+          servicesSecondaryRangeName: $(ref.corp-gke-nodes-subnet.secondaryIpRanges[1].rangeName)
+        masterIpv4CidrBlock: 10.17.5.0/28
